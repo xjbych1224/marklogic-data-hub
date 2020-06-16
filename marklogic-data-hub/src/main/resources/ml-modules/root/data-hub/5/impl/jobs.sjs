@@ -13,6 +13,18 @@
 'use strict';
 // Batch documents can be cached because they should never be altered across transactions
 const cachedBatchDocuments = {};
+const cachedFlowSteps = {};
+
+const getFlowStep = (datahub, flowName, step) => {
+  if (!cachedFlowSteps[`${flowName}:${step}`]) {
+    cachedFlowSteps[`${flowName}:${step}`] = fn.head(datahub.hubUtils.queryLatest(function () {
+          return datahub.flow.getFlow(flowName).steps[step];
+        },
+        datahub.config.FINALDATABASE
+    ));
+  }
+  return cachedFlowSteps[`${flowName}:${step}`];
+};
 
 class Jobs {
 
@@ -313,6 +325,9 @@ module.exports.updateJob = module.amp(
     //update job doc before and after step run
     jobDoc.job.jobStatus = status;
     if (step) {
+      if (!(jobDoc.job.targetEntityType && jobDoc.job.lastAttemptedStep === step)) {
+        jobDoc.job.targetEntityType = getFlowStep(datahub, flow, step).options.targetEntityType;
+      }
       jobDoc.job.lastAttemptedStep = step;
       if(lastCompleted) {
        jobDoc.job.lastCompletedStep = lastCompleted;
@@ -343,11 +358,7 @@ module.exports.updateJob = module.amp(
           // a better error will be thrown later when the step is run and the module cannot be found.
         }
         if (jobsReportFun) {
-          let flowStep = fn.head(datahub.hubUtils.queryLatest(function () {
-              return datahub.flow.getFlow(stepResp.flowName).steps[step];
-            },
-            datahub.config.FINALDATABASE
-          ));
+          let flowStep = getFlowStep(datahub, stepResp.flowName, step);
           let options = Object.assign({}, stepDef.options, flowStep.options);
           let jobReport = fn.head(datahub.hubUtils.queryLatest(function () {
               return jobsReportFun(jobId, stepResp, options);
