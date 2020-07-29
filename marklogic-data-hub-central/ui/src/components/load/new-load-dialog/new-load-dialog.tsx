@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import styles from './new-load-dialog.module.scss';
 import { srcOptions, tgtOptions, fieldSeparatorOptions } from '../../../config/formats.config';
 import {NewLoadTooltips} from '../../../config/tooltips.config';
-import { MLButton, MLTooltip } from '@marklogic/design-system';
+import { MLButton, MLTooltip, MLModal } from '@marklogic/design-system';
 
 
 const NewLoadDialog = (props) => {
@@ -119,7 +119,7 @@ const NewLoadDialog = (props) => {
     setDeleteDialogVisible(false)
   }
 
-  const deleteConfirmation = <Modal
+  const deleteConfirmation = <MLModal.MLDraggableModalProvider><MLModal
         visible={deleteDialogVisible}
         bodyStyle={{textAlign: 'center'}}
         width={250}
@@ -135,7 +135,7 @@ const NewLoadDialog = (props) => {
             &nbsp;&nbsp;
             <MLButton aria-label="Yes" type="primary" htmlType="submit" onClick={onDelOk}>Yes</MLButton>
           </div>
-    </Modal>;
+    </MLModal></MLModal.MLDraggableModalProvider>;
 
   const handleSubmit = async (event: { preventDefault: () => void; }) => {
     if (event) event.preventDefault();
@@ -244,7 +244,7 @@ const NewLoadDialog = (props) => {
   const toptions = Object.keys(tgtOptions).map(d => <Select.Option key={tgtOptions[d]}>{d}</Select.Option>);
 
 
-  return (<Modal visible={props.newLoad}
+  return (<MLModal.MLDraggableModalProvider><MLModal visible={props.newLoad}
     title={null}
     width="55em"
     onCancel={() => onCancel()}
@@ -380,7 +380,7 @@ const NewLoadDialog = (props) => {
       </Form>
     </div>
     {deleteConfirmation}
-  </Modal>)
+  </MLModal></MLModal.MLDraggableModalProvider>)
 }
 
 export default NewLoadDialog;
