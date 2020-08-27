@@ -20,8 +20,16 @@ const defaultUserData = {
   maxSessionTime: 300
 }
 
+const defaultErrorData = {
+  status: '',
+  message: '',
+  details: '',
+  suggestion: ''
+}
+
 export const UserContext = React.createContext<IUserContextInterface>({
   user: defaultUserData,
+  error: defaultErrorData,
   loginAuthenticated: () => {},
   sessionAuthenticated: () => {},
   userNotAuthenticated: () => {},
@@ -36,6 +44,7 @@ export const UserContext = React.createContext<IUserContextInterface>({
 const UserProvider: React.FC<{ children: any }> = ({children}) => {
 
   const [user, setUser] = useState<UserContextInterface>(defaultUserData);
+  const [error, setError] = useState(defaultErrorData);
   const [stompMessageSubscription, setStompMessageSubscription] = useState<Subscription|null>(null);
   const [unsubscribeId, setUnsubscribeId] = useState<string|null>(null);
   const sessionUser = localStorage.getItem('dataHubUser');
@@ -116,7 +125,6 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
         ...user,
         name: username,
         authenticated: true,
-        // redirect: true,
         // pageRoute: values.pageRoute,
         maxSessionTime: sessionCount.current
       });
@@ -126,7 +134,6 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
         ...user,
         name: username,
         authenticated: true,
-        // redirect: true,
         maxSessionTime: sessionCount.current
       });
     }
@@ -159,12 +166,21 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
       localStorage.setItem('hubCentralSessionToken', '');
       authoritiesService.setAuthorities([]);
       resetEnvironment();
-      setUser({...user, name: '', authenticated: false}); //, redirect: true});
+      setUser({...user, name: '', authenticated: false});
     });
   };
 
+  const getError = (err) => {
+    return {
+      status: err.response.hasOwnProperty('status') ? err.response.status : '',
+      message: err.response.data.hasOwnProperty('message') ? err.response.data.message : '',
+      details: err.response.data.hasOwnProperty('details') ? err.response.data.details : '',
+      suggestion: err.response.data.hasOwnProperty('suggestion') ? err.response.data.suggestion : ''
+    }
+  }
+
   const handleError = (error) => {
-    const DEFAULT_MESSAGE = 'Internal Server Error';
+    console.log('HTTP ERROR', error.response);
     switch (error.response.status) {
       case 401: {
         localStorage.setItem('dataHubUser', '');
@@ -175,36 +191,7 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
       case 403:
       case 405:
       case 408:
-      case 414: {
-        console.log('HTTP ERROR', error.response);
-        let title = error.response.status + ' ' + error.response.statusText;
-        let message = DEFAULT_MESSAGE;
-
-        if (error.response.data.hasOwnProperty('message')) {
-          message = error.response.data.message;
-        }
-        setUser({
-          ...user,
-          error: {
-            title: title,
-            message: message,
-            type: 'ALERT'
-          }
-        });
-        break;
-      }
-      case 404: {
-        setUser({
-          ...user,
-          // redirect: true,
-          error: {
-            title: error.response.data.error,
-            message: error.response.data.message || DEFAULT_MESSAGE,
-            type: 'ALERT'
-          }
-        });
-      break;
-      }
+      case 414: 
       case 500:
       case 501:
       case 502:
@@ -212,41 +199,28 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
       case 504:
       case 505:
       case 511: {
-        console.log('HTTP ERROR ', error.response);
-        let title = error.response.status + ' ' + error.response.statusText;
-        let message = DEFAULT_MESSAGE;
-
-        if (error.response.data.hasOwnProperty('message')) {
-          message = error.response.data.message;
-        }
-        setUser({
-          ...user,
-          error: {
-            title,
-            message,
-            type: 'MODAL'
-          }
-        });
+        setError(getError(error));
+        break;
+      }
+      case 404: {
+        // NOTE this case currently intercepted and handled by the App.tsx routing
+        setError(getError(error));
         break;
       }
       default: {
-        console.log('HTTP ERROR ', error.response);
-
-        setUser({
-          ...user,
-          error: {
-            title: DEFAULT_MESSAGE,
-            message: 'Please check the console for more information',
-            type: 'MODAL'
-          }
-        });
+        setError(getError(error));
         break;
       }
     }
   }
 
   const clearErrorMessage = () => {
-    setUser({ ...user, error : { title:'', message: '', type: '' }});
+    setError({
+      status: '',
+      message: '',
+      details: '',
+      suggestion: ''
+    });
   }
 
   const setPageRoute = (route: string) => {
@@ -291,6 +265,7 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
   return (
     <UserContext.Provider value={{
       user,
+      error,
       loginAuthenticated,
       sessionAuthenticated,
       userNotAuthenticated,

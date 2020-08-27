@@ -123,6 +123,7 @@ const Run = (props) => {
             console.error('Error posting flow', error);
             setIsLoading(false);
             let message = error.response.data.message;
+            //handleError(error);
             message.indexOf(newFlow.name) > -1 ? Modal.error({
                 content: <p>Unable to create a flow. Flow with the name <b>{newFlow.name}</b> already exists.</p>
             }) : Modal.error({
@@ -398,7 +399,7 @@ const Run = (props) => {
 
     // DELETE /flows​/{flowId}​/steps​/{stepId}
     const deleteStep = async (flowId, stepNumber) => {
-        let url = '/api/flows/' + flowId + '/steps/' + stepNumber;
+        let url = '/api/flows/' + flowId + '/stepsbad/' + stepNumber;
         try {
             setIsLoading(true);
             let response = await axios.delete(url);
@@ -408,6 +409,7 @@ const Run = (props) => {
         } catch (error) {
             console.error('Error deleting step', error);
             setIsLoading(false);
+            handleError(error);
         }
     }
 

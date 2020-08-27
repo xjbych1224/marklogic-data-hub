@@ -14,7 +14,7 @@ const NoMatchRedirect = ({history}) => {
   }, []);
 
   const backToHomePage = () => {
-    return user.authenticated ? history.push('/home') : history.push('/');
+    return user.authenticated ? history.push('/tiles') : history.push('/');
   }
   return (
       <Result
