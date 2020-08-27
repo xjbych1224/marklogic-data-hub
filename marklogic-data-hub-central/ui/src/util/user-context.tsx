@@ -20,8 +20,15 @@ const defaultUserData = {
   maxSessionTime: 300
 }
 
+const defaultErrorData = {
+  title: '',
+  message: '',
+  type: ''
+}
+
 export const UserContext = React.createContext<IUserContextInterface>({
   user: defaultUserData,
+  error: defaultErrorData,
   loginAuthenticated: () => {},
   sessionAuthenticated: () => {},
   userNotAuthenticated: () => {},
@@ -36,6 +43,7 @@ export const UserContext = React.createContext<IUserContextInterface>({
 const UserProvider: React.FC<{ children: any }> = ({children}) => {
 
   const [user, setUser] = useState<UserContextInterface>(defaultUserData);
+  const [error, setError] = useState(defaultErrorData);
   const [stompMessageSubscription, setStompMessageSubscription] = useState<Subscription|null>(null);
   const [unsubscribeId, setUnsubscribeId] = useState<string|null>(null);
   const sessionUser = localStorage.getItem('dataHubUser');
@@ -183,6 +191,12 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
         if (error.response.data.hasOwnProperty('message')) {
           message = error.response.data.message;
         }
+        // TODO remove error handling from user object
+        setError({
+          title: title,
+          message: message,
+          type: 'ALERT'
+        });
         setUser({
           ...user,
           error: {
@@ -194,9 +208,13 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
         break;
       }
       case 404: {
+        setError({
+          title: error.response.data.error,
+          message: error.response.data.message || DEFAULT_MESSAGE,
+          type: 'ALERT'
+        });
         setUser({
           ...user,
-          // redirect: true,
           error: {
             title: error.response.data.error,
             message: error.response.data.message || DEFAULT_MESSAGE,
@@ -219,11 +237,16 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
         if (error.response.data.hasOwnProperty('message')) {
           message = error.response.data.message;
         }
+        setError({
+          title: title,
+          message: message,
+          type: 'MODAL'
+        });
         setUser({
           ...user,
           error: {
-            title,
-            message,
+            title: title,
+            message: message,
             type: 'MODAL'
           }
         });
@@ -231,7 +254,11 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
       }
       default: {
         console.log('HTTP ERROR ', error.response);
-
+        setError({
+          title: DEFAULT_MESSAGE,
+          message: 'Please check the console for more information',
+          type: 'MODAL'
+        });
         setUser({
           ...user,
           error: {
@@ -246,7 +273,9 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
   }
 
   const clearErrorMessage = () => {
-    setUser({ ...user, error : { title:'', message: '', type: '' }});
+    // TODO remove error handling in user object
+    //setUser({ ...user, error : { title:'', message: '', type: '' }});
+    setError({ title:'', message: '', type: '' });
   }
 
   const setPageRoute = (route: string) => {
@@ -291,6 +320,7 @@ const UserProvider: React.FC<{ children: any }> = ({children}) => {
   return (
     <UserContext.Provider value={{
       user,
+      error,
       loginAuthenticated,
       sessionAuthenticated,
       userNotAuthenticated,

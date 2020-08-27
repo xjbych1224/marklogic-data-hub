@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import TilesView from './pages/TilesView';
 import NoMatchRedirect from './pages/noMatchRedirect';
 import NoResponse from './pages/NoResponse';
+import Error from './components/error/error';
 import ModalStatus from './components/modal-status/modal-status';
 import NavigationPrompt from './components/navigation-prompt/navigation-prompt';
 
@@ -25,7 +26,9 @@ interface Props extends RouteComponentProps<any> {}
 const App: React.FC<Props> = ({history, location}) => {
   const {
     user,
-    handleError
+    error,
+    handleError,
+    clearErrorMessage
   } = useContext(UserContext);
 
   const PrivateRoute = ({ children, ...rest }) => (
@@ -41,22 +44,32 @@ const App: React.FC<Props> = ({history, location}) => {
     )}/>
   );
 
+  const showErrorPage = () => {
+    history.push({
+      pathname: '/error',
+      state: { message: error['message'] ? error['message'] : 'No error message' }
+    });
+    clearErrorMessage();
+  }
+
   useEffect(() => {
-    if (user.authenticated){
+    // Error
+    if (error.type !== '') {
+      showErrorPage();
+    // Logged in
+    } else if (user.authenticated) {
       if (location.pathname === '/') {
-        history.push(user.pageRoute);
+        history.push(user.pageRoute); // Redirect to last saved page
       } else {
-        history.push(location.pathname);
+        history.push(location.pathname); 
       }
+    // Not logged in
     } else {
-      if (user.error.type !== '') {
-        history.push('/error');
-      } else {
-        if (location.pathname !== '/' && location.pathname !== '/noresponse') {
-          user.pageRoute = location.pathname;
-        }
-        history.push('/');
+      // Save last page (on logout)
+      if (location.pathname !== '/' && location.pathname !== '/noresponse' && location.pathname !== '/error') {
+        user.pageRoute = location.pathname;
       }
+      history.push('/'); // Redirect to Login
     }
   }, [user]);
 
@@ -91,6 +104,7 @@ const App: React.FC<Props> = ({history, location}) => {
             <Switch>
               <Route path="/" exact component={Login}/>
               <Route path="/noresponse" exact component={NoResponse} />
+              <Route path="/error" exact component={Error} />
               <PrivateRoute path="/tiles" exact>
                 <TilesView/>
               </PrivateRoute>

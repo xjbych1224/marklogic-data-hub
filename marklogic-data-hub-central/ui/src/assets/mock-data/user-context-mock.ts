@@ -3,17 +3,14 @@ import { UserContextInterface, IUserContextInterface } from '../../types/user-ty
 const defaultUserData: UserContextInterface = {
   name: '',
   authenticated: false,
-  error : {
-    title: '',
-    message: '',
-    type: ''
-  },
+  error : {},
   pageRoute: '/',
   maxSessionTime: 300
 }
 
 const defaultUserContext: IUserContextInterface = {
   user: defaultUserData,
+  error: {},
   loginAuthenticated: jest.fn(),
   sessionAuthenticated: jest.fn(),
   userNotAuthenticated: jest.fn(),
@@ -51,6 +48,7 @@ export const userSessionWarning: IUserContextInterface = {
     pageRoute: '/',
     maxSessionTime: 300
   },
+  error: {},
   loginAuthenticated: jest.fn(),
   sessionAuthenticated: jest.fn(),
   setPageRoute: jest.fn(),
@@ -74,6 +72,7 @@ export const userModalError: IUserContextInterface = {
     pageRoute: '/',
     maxSessionTime: 300
   },
+  error: {},
   loginAuthenticated: jest.fn(),
   sessionAuthenticated: jest.fn(),
   setPageRoute: jest.fn(),
@@ -97,6 +96,7 @@ export const userNoErrorNoSessionWarning: IUserContextInterface = {
     pageRoute: '/',
     maxSessionTime: 300
   },
+  error: {},
   loginAuthenticated: jest.fn(),
   sessionAuthenticated: jest.fn(),
   setPageRoute: jest.fn(),
@@ -120,6 +120,7 @@ export const userHasModalErrorHasSessionWarning: IUserContextInterface = {
     pageRoute: '/',
     maxSessionTime: 300
   },
+  error: {},
   loginAuthenticated: jest.fn(),
   sessionAuthenticated: jest.fn(),
   setPageRoute: jest.fn(),

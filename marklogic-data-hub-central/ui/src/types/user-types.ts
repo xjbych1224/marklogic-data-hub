@@ -8,6 +8,7 @@ export interface UserContextInterface {
   
 export interface IUserContextInterface {
     user: UserContextInterface;
+    error: any;
     loginAuthenticated: (username: string, authResponse: any) => void;
     sessionAuthenticated: (username: string) => void;
     userNotAuthenticated: () => void;

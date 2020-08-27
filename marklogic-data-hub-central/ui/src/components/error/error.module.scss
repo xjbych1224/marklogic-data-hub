@@ -1,0 +1,44 @@
+  .rightAlign{
+    float: right;
+    margin-bottom: 20px;
+    width: 80px;
+  }
+  .content{
+    margin: 50px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    min-width: 720px;
+    max-width: 1000px;
+    width: 90%;
+    margin: 50px auto;
+  }
+  .title{
+    font-size: 36px;
+    font-weight: bold;
+  }
+  .spacer{
+    margin-top: 20px;
+  }
+  .sadFace{
+    display: inline-block;
+    background-image: url("../../assets/oopsIcon.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 350px;
+    height: 190px;
+  }
+  .errorHead{
+    display: inline-block;
+    vertical-align: top;
+    font-weight: bold;
+    width: 360px;
+  }
+  .errorContainer{
+    float: left;
+    border: 1px solid #b32424;
+    border-radius: 4px;
+    padding: 20px;
+    width: 100%;
+  }

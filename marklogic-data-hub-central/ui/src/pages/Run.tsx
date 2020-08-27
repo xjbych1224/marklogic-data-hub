@@ -398,7 +398,7 @@ const Run = (props) => {
 
     // DELETE /flows​/{flowId}​/steps​/{stepId}
     const deleteStep = async (flowId, stepNumber) => {
-        let url = '/api/flows/' + flowId + '/steps/' + stepNumber;
+        let url = '/api/flows/' + flowId + '/stepsbad/' + stepNumber;
         try {
             setIsLoading(true);
             let response = await axios.delete(url);
@@ -408,6 +408,7 @@ const Run = (props) => {
         } catch (error) {
             console.error('Error deleting step', error);
             setIsLoading(false);
+            handleError(error);
         }
     }
 
