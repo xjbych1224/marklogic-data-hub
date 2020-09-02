@@ -29,6 +29,8 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 /**
  * Configures Spring Security for the central web application.
@@ -61,8 +63,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 if (request.getRequestURI().startsWith("/api/")) {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 } else {
-                    response.addHeader("Referer", request.getRequestURI());
-                    response.sendRedirect("/");
+                    response.sendRedirect("/?from=" + URLEncoder.encode(request.getRequestURI(), "UTF-8"));
                 }
             }))
             .and()
