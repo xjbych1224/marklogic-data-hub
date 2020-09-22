@@ -1,0 +1,9 @@
+.mosaic-window-body {
+    background: url('../../assets/sidebar-bg.png') repeat-y !important;
+}
+
+// When above .mosaic-window-body is turned on, 
+// .mosaic-preview must be manually hidden, not sure why.
+.mosaic-preview {
+    display: none;
+}

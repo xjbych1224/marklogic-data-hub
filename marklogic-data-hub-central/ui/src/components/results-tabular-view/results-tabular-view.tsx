@@ -12,6 +12,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { dateConverter } from '../../util/date-conversion';
 import { MLTooltip } from '@marklogic/design-system';
 
+import './results-tabular-view.scss';
+
 interface Props {
     data: any;
     entityPropertyDefinitions: any[];

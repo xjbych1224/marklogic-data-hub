@@ -303,7 +303,7 @@ const Browse: React.FC<Props> = ({ location }) => {
           collapsedWidth={0}
           collapsible
           collapsed={collapse}
-          width={'20vw'}
+          width={'250px'}
         >
           <Sidebar
             facets={facets}
