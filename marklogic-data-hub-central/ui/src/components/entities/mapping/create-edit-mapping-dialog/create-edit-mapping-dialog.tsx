@@ -4,7 +4,8 @@ import styles from './create-edit-mapping-dialog.module.scss';
 import { NewMapTooltips } from '../../../../config/tooltips.config';
 import Axios from "axios";
 import { MLButton, MLTooltip } from '@marklogic/design-system';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSlidersH } from '@fortawesome/free-solid-svg-icons'
 
 const CreateEditMappingDialog = (props) => {
 
@@ -304,6 +305,10 @@ const CreateEditMappingDialog = (props) => {
     }
   }
 
+  const handleStepDetails = (name) => {
+    onCancel();
+    props.openStepDetails(name);
+  }
 
   const formItemLayout = {
     labelCol: {
@@ -421,6 +426,11 @@ const CreateEditMappingDialog = (props) => {
           </div>
         </Form.Item>
       </Form>
+      { (props.title === 'Edit Mapping Step') ? 
+      <div className={styles.stepDetailsLink} onClick={() => handleStepDetails(mapName)}>
+        <FontAwesomeIcon icon={faSlidersH} aria-label={'stepDetails'}/> 
+        <span className={styles.stepDetailsLabel}>Step Details</span>
+      </div> : null }
     </div>
     {deleteConfirmation}
   </Modal>)

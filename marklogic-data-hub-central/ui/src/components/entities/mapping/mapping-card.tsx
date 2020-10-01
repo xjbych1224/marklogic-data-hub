@@ -569,6 +569,10 @@ const MappingCard: React.FC<Props> = (props) => {
             setMappingVisible(true);
       }
 
+    const openStepDetails = (name) => {
+        // need step's name and array index to option mapping details
+        openSourceToEntityMapping(name, props.data.findIndex(el => el.name === name));
+    }
 
     const cardContainer: CSSProperties = {
         cursor: 'pointer',width: '330px',margin:'-12px -12px', padding: '5px 5px'
@@ -626,60 +630,60 @@ const MappingCard: React.FC<Props> = (props) => {
                         <p className={styles.addNewContent}>Add New</p>
                     </Card>
                 </Col> : ''}{props && props.data.length > 0 ? props.data.map((elem,index) => (
-                    <Col key={index}>
-                        <div
-                            data-testid={`${props.entityTypeTitle}-${elem.name}-step`}
-                            onMouseOver={(e) => handleMouseOver(e, elem.name)}
-                            onMouseLeave={(e) => setShowLinks('')}
+                <Col key={index}>
+                    <div
+                        data-testid={`${props.entityTypeTitle}-${elem.name}-step`}
+                        onMouseOver={(e) => handleMouseOver(e, elem.name)}
+                        onMouseLeave={(e) => setShowLinks('')}
+                    >
+                        <Card
+                            actions={[
+                                <MLTooltip title={'Edit'} placement="bottom"><Icon className={styles.editIcon} type="edit" key ="last" role="edit-mapping button" data-testid={elem.name+'-edit'} onClick={() => OpenEditStepDialog(index)}/></MLTooltip>,
+                                <MLTooltip title={'Step Details'} placement="bottom"><i style={{ fontSize: '16px', marginLeft: '-5px', marginRight: '5px'}}><FontAwesomeIcon icon={faSlidersH} onClick={() => openSourceToEntityMapping(elem.name,index)} data-testid={`${elem.name}-stepDetails`}/></i></MLTooltip>,
+                                <MLTooltip title={'Settings'} placement="bottom"><Icon type="setting" key="setting" role="settings-mapping button" data-testid={elem.name+'-settings'} onClick={() => OpenMappingSettingsDialog(index)}/></MLTooltip>,
+                                props.canReadWrite ? <MLTooltip title={'Delete'} placement="bottom"><i key ="last" role="delete-mapping button" data-testid={elem.name+'-delete'} onClick={() => handleCardDelete(elem.name)}><FontAwesomeIcon icon={faTrashAlt} className={styles.deleteIcon} size="lg"/></i></MLTooltip> : <MLTooltip title={'Delete: ' + SecurityTooltips.missingPermission} placement="bottom" overlayStyle={{maxWidth: '200px'}}><i role="disabled-delete-mapping button" onClick={(event) => event.preventDefault()}><FontAwesomeIcon icon={faTrashAlt} className={styles.disabledDeleteIcon} size="lg"/></i></MLTooltip>,
+                            ]}
+                            className={styles.cardStyle}
+                            size="small"
                         >
-                            <Card
-                                actions={[
-                                    <MLTooltip title={'Edit'} placement="bottom"><Icon className={styles.editIcon} type="edit" key ="last" role="edit-mapping button" data-testid={elem.name+'-edit'} onClick={() => OpenEditStepDialog(index)}/></MLTooltip>,
-                                    <MLTooltip title={'Step Details'} placement="bottom"><i style={{ fontSize: '16px', marginLeft: '-5px', marginRight: '5px'}}><FontAwesomeIcon icon={faSlidersH} onClick={() => openSourceToEntityMapping(elem.name,index)} data-testid={`${elem.name}-stepDetails`}/></i></MLTooltip>,
-                                    <MLTooltip title={'Settings'} placement="bottom"><Icon type="setting" key="setting" role="settings-mapping button" data-testid={elem.name+'-settings'} onClick={() => OpenMappingSettingsDialog(index)}/></MLTooltip>,
-                                    props.canReadWrite ? <MLTooltip title={'Delete'} placement="bottom"><i key ="last" role="delete-mapping button" data-testid={elem.name+'-delete'} onClick={() => handleCardDelete(elem.name)}><FontAwesomeIcon icon={faTrashAlt} className={styles.deleteIcon} size="lg"/></i></MLTooltip> : <MLTooltip title={'Delete: ' + SecurityTooltips.missingPermission} placement="bottom" overlayStyle={{maxWidth: '200px'}}><i role="disabled-delete-mapping button" onClick={(event) => event.preventDefault()}><FontAwesomeIcon icon={faTrashAlt} className={styles.disabledDeleteIcon} size="lg"/></i></MLTooltip>,
-                                ]}
-                                className={styles.cardStyle}
-                                size="small"
-                            >
-                                <div className={styles.formatFileContainer}>
-                                    <span aria-label={`${elem.name}-step-label`} className={styles.mapNameStyle}>{getInitialChars(elem.name, 27, '...')}</span>
-                                    {/* <span style={sourceFormatStyle(elem.sourceFormat)}>{elem.sourceFormat.toUpperCase()}</span> */}
+                            <div className={styles.formatFileContainer}>
+                                <span aria-label={`${elem.name}-step-label`} className={styles.mapNameStyle}>{getInitialChars(elem.name, 27, '...')}</span>
+                                {/* <span style={sourceFormatStyle(elem.sourceFormat)}>{elem.sourceFormat.toUpperCase()}</span> */}
 
-                                </div><br />
-                                {elem.selectedSource === 'collection' ? <div className={styles.sourceQuery}>Collection: {extractCollectionFromSrcQuery(elem.sourceQuery)}</div> : <div className={styles.sourceQuery}>Source Query: {getInitialChars(elem.sourceQuery,32,'...')}</div>}
-                                <br /><br />
-                                <p className={styles.lastUpdatedStyle}>Last Updated: {convertDateFromISO(elem.lastUpdated)}</p>
-                                <div className={styles.cardLinks} style={{display: showLinks === elem.name ? 'block' : 'none'}}>
-                                    { props.canWriteFlow ? <Link id="tiles-run-add" to={
-                                    {pathname: '/tiles/run/add',
-                                    state: {
-                                        stepToAdd : elem.name,
-                                        stepDefinitionType : 'mapping'
-                                    }}}><div className={styles.cardLink} data-testid={`${elem.name}-toNewFlow`}> Add step to a new flow</div></Link> : <div className={styles.cardDisabledLink} data-testid={`${elem.name}-disabledToNewFlow`}> Add step to a new flow</div> }
-                                    <div className={styles.cardNonLink} data-testid={`${elem.name}-toExistingFlow`}>
-                                        Add step to an existing flow
-                                        <div className={styles.cardLinkSelect}>
-                                            <Select
-                                                style={{ width: '100%' }}
-                                                onChange={(flowName) => handleSelect({flowName: flowName, mappingName: elem.name})}
-                                                placeholder="Select Flow"
-                                                defaultActiveFirstOption={false}
-                                                disabled={!props.canWriteFlow}
-                                                data-testid={`${elem.name}-flowsList`}
-                                            >
-                                                { props.flows && props.flows.length > 0 ? props.flows.map((f,i) => (
-                                                    <Option aria-label={`${f.name}-option`} value={f.name} key={i}>{f.name}</Option>
-                                                )) : null}
-                                            </Select>
-                                        </div>
+                            </div><br />
+                            {elem.selectedSource === 'collection' ? <div className={styles.sourceQuery}>Collection: {extractCollectionFromSrcQuery(elem.sourceQuery)}</div> : <div className={styles.sourceQuery}>Source Query: {getInitialChars(elem.sourceQuery,32,'...')}</div>}
+                            <br /><br />
+                            <p className={styles.lastUpdatedStyle}>Last Updated: {convertDateFromISO(elem.lastUpdated)}</p>
+                            <div className={styles.cardLinks} style={{display: showLinks === elem.name ? 'block' : 'none'}}>
+                                { props.canWriteFlow ? <Link id="tiles-run-add" to={
+                                {pathname: '/tiles/run/add',
+                                state: {
+                                    stepToAdd : elem.name,
+                                    stepDefinitionType : 'mapping'
+                                }}}><div className={styles.cardLink} data-testid={`${elem.name}-toNewFlow`}> Add step to a new flow</div></Link> : <div className={styles.cardDisabledLink} data-testid={`${elem.name}-disabledToNewFlow`}> Add step to a new flow</div> }
+                                <div className={styles.cardNonLink} data-testid={`${elem.name}-toExistingFlow`}>
+                                    Add step to an existing flow
+                                    <div className={styles.cardLinkSelect}>
+                                        <Select
+                                            style={{ width: '100%' }}
+                                            onChange={(flowName) => handleSelect({flowName: flowName, mappingName: elem.name})}
+                                            placeholder="Select Flow"
+                                            defaultActiveFirstOption={false}
+                                            disabled={!props.canWriteFlow}
+                                            data-testid={`${elem.name}-flowsList`}
+                                        >
+                                            { props.flows && props.flows.length > 0 ? props.flows.map((f,i) => (
+                                                <Option aria-label={`${f.name}-option`} value={f.name} key={i}>{f.name}</Option>
+                                            )) : null}
+                                        </Select>
                                     </div>
                                 </div>
-                            </Card>
-                        </div>
-                    </Col>
-                )) : <span></span> }</Row>
-                <CreateEditMappingDialog
+                            </div>
+                        </Card>
+                    </div>
+                </Col>
+            )) : <span></span> }</Row>
+            <CreateEditMappingDialog
                 newMap={newMap}
                 title={title}
                 setNewMap={setNewMap}
@@ -688,9 +692,11 @@ const MappingCard: React.FC<Props> = (props) => {
                 deleteMappingArtifact={props.deleteMappingArtifact}
                 mapData={mapData}
                 canReadWrite={props.canReadWrite}
-                canReadOnly={props.canReadOnly}/>
-                {deleteConfirmation}
-                <SourceToEntityMap
+                canReadOnly={props.canReadOnly}
+                openStepDetails={openStepDetails}
+            />
+            {deleteConfirmation}
+            <SourceToEntityMap
                 sourceData={sourceData}
                 sourceURI={sourceURI}
                 sourceFormat={sourceFormat}
@@ -717,7 +723,9 @@ const MappingCard: React.FC<Props> = (props) => {
                 namespaces={namespaces}
                 mapIndex={mapIndex}
                 tgtEntityReferences={tgtEntityReferences}
-                isLoading={isLoading}/>
+                isLoading={isLoading}
+                openStepSettings={OpenMappingSettingsDialog}
+            />
             <AdvancedSettingsDialog
                 tooltipsData={AdvMapTooltips}
                 openAdvancedSettings={openMappingSettings}
@@ -725,6 +733,7 @@ const MappingCard: React.FC<Props> = (props) => {
                 stepData={mapData}
                 activityType={activityType}
                 canWrite={authorityService.canWriteMapping()}
+                openStepDetails={openStepDetails}
             />
             {addConfirmation}
         </div>

@@ -14,6 +14,8 @@ import { AdvancedSettingsMessages } from '../../config/messages.config';
 import { UserContext } from '../../util/user-context';
 import Axios from 'axios';
 import { MLButton, MLTooltip } from '@marklogic/design-system';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSlidersH } from '@fortawesome/free-solid-svg-icons'
 
 
 const { TextArea } = Input;
@@ -478,6 +480,11 @@ const AdvancedSettingsDialog = (props) => {
     },
   };
 
+  const handleStepDetails = (name) => {
+    onCancel();
+    props.openStepDetails(name)
+  }
+
   const sourceDbOptions = databaseOptions.map(d => <Option data-testid={`sourceDbOptions-${d}`} key={d}>{d}</Option>);
   const targetDbOptions = databaseOptions.map(d => <Option data-testid={`targetDbOptions-${d}`} key={d}>{d}</Option>);
 
@@ -810,6 +817,11 @@ const AdvancedSettingsDialog = (props) => {
           </div>
         </Form.Item>
       </Form>
+      { (props.activityType === 'mapping') ? 
+      <div className={styles.stepDetailsLink} onClick={() => handleStepDetails(props.stepData.name)}>
+        <FontAwesomeIcon icon={faSlidersH} aria-label={`${props.stepData.name}-stepDetails`}/> 
+        <span className={styles.stepDetailsLabel}>Step Details</span>
+      </div> : null }
     </div>
     {deleteConfirmation}
   </Modal>;

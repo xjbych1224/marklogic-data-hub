@@ -55,3 +55,15 @@
     width:100%;
     height:56px;
 }
+
+.stepDetailsLink {
+    position: absolute;
+    bottom: 32px;
+    left: 28px;
+    color: #44499C;
+    cursor: pointer;
+    .stepDetailsLabel {
+        display: inline-block;
+        margin-left: 6px;
+    }
+}

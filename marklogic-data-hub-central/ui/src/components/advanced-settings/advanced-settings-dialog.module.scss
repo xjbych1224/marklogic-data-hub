@@ -27,6 +27,7 @@
 
 .submitButtonsForm {
     text-align: right;
+    margin-top: 15px;
     margin-bottom: -15px;
     margin-right: 5px;
 }
@@ -140,4 +141,16 @@ span.readOnlyLabel {
 .invalidExpand {
     color: #C00;
     margin-left: 24px;
+}
+
+.stepDetailsLink {
+    position: absolute;
+    bottom: 22px;
+    left: 26px;
+    color: #44499C;
+    cursor: pointer;
+    .stepDetailsLabel {
+        display: inline-block;
+        margin-left: 6px;
+    }
 }
