@@ -1,6 +1,6 @@
 import React from 'react';
 import { Router } from 'react-router';
-import {render, fireEvent, wait, within, cleanup, waitForElement, getByTestId, screen} from '@testing-library/react';
+import { render, fireEvent, wait, cleanup } from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import '@testing-library/jest-dom/extend-expect'
 import { createMemoryHistory } from 'history';
@@ -8,7 +8,7 @@ const history = createMemoryHistory();
 import axiosMock from 'axios';
 import data from '../../assets/mock-data/curation/flows.data';
 import Flows from './flows';
-import {ModelingTooltips, SecurityTooltips} from "../../config/tooltips.config";
+import { SecurityTooltips } from "../../config/tooltips.config";
 
 jest.mock('axios');
 

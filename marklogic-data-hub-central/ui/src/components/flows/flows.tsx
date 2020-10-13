@@ -1,5 +1,5 @@
-import React, { useState, CSSProperties, useEffect, useContext } from 'react';
-import { Collapse, Spin, Icon, Card, Tooltip, Modal, Upload, message, Menu, Dropdown } from 'antd';
+import React, { useState, CSSProperties, useEffect, useContext, createRef } from 'react';
+import { Collapse, Icon, Card, Modal, Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
@@ -10,13 +10,12 @@ import {RunToolTips, SecurityTooltips} from '../../config/tooltips.config';
 import styles from './flows.module.scss';
 import { MLTooltip, MLSpin, MLUpload } from '@marklogic/design-system';
 import { AuthoritiesContext } from "../../util/authorities";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import axios from "axios";
 import {UserContext} from "../../util/user-context";
 import './flows.scss';
 
 const { Panel } = Collapse;
-const { SubMenu } = Menu;
 
 interface Props {
     flows: any;
@@ -74,7 +73,37 @@ const Flows: React.FC<Props> = (props) => {
     const [showLinks, setShowLinks] = useState('');
     const [latestJobData, setLatestJobData] = useState<any>({});
     const [createAdd, setCreateAdd] = useState(true);
-
+    const [addFlowDirty, setAddFlowDirty] = useState({});
+    const [addExternalFlowDirty, setExternalAddFlowDirty] = useState(true);
+    const location = useLocation()
+    
+    // maintain a list of panel refs 
+    const flowPanels : any = props.flows.reduce((p, n) => ({...p, ...{[n.name]: createRef()} }), {})
+        
+    // If a step was just added scroll the flow step panel fully to the right
+    useEffect(() => {
+        const scrollToEnd = f => {
+            const panel = flowPanels[f]
+            if (panel && panel.current) {
+                const { scrollWidth } = panel.current
+                panel.current.scrollTo(scrollWidth * 2, 0)
+            }
+        }
+        if (!props.flows.length) return
+        if (addFlowDirty[flowName]) {
+            scrollToEnd(flowName)
+            setAddFlowDirty({...addFlowDirty, [flowName]: false})
+        } else {
+            const { state = {} } = location
+            const externalDirty = (state ? state['addFlowDirty'] : false) && addExternalFlowDirty
+            const thisFlow = state ? state['flowName'] : null
+            if (externalDirty) {
+                scrollToEnd(thisFlow)
+                const panel = flowPanels[thisFlow]
+                setExternalAddFlowDirty(false)
+            }
+        }
+    }, [props.flows])
 
     useEffect(() => {
         if (JSON.stringify(props.flowsDefaultActiveKey) !== JSON.stringify([])) {
@@ -90,9 +119,6 @@ const Flows: React.FC<Props> = (props) => {
             setActiveKeys([]);
         }
     }, [props.flows])
-
-    useEffect(() => {
-    }, [latestJobData])
 
     // Get the latest job info after a step (in a flow) run
     useEffect(()=>{
@@ -175,15 +201,16 @@ const Flows: React.FC<Props> = (props) => {
         setStepDialogVisible(false);
     }
 
-    const onAddStepOk = (stepName, flowName, stepType) => {
-        props.addStepToFlow(stepName, flowName, stepType);
+    const onAddStepOk = async (stepName, flowName, stepType) => {
+        await props.addStepToFlow(stepName, flowName, stepType);
         // Open flow panel if not open
         const flowIndex = props.flows.findIndex(f => f.name === flowName);
         if (!activeKeys.includes(flowIndex)) {
             let newActiveKeys = [...activeKeys, flowIndex];
             setActiveKeys(newActiveKeys);
         }
-        setAddStepDialogVisible(false);
+        await setAddStepDialogVisible(false);
+        await setAddFlowDirty({...addFlowDirty, [flowName]: true})
     }
 
     const onCancel = () => {
@@ -448,6 +475,7 @@ const Flows: React.FC<Props> = (props) => {
     }
 
     let panels;
+    
     if (props.flows) {
         panels = props.flows.map((flow, i) => {
             let flowName = flow.name;
@@ -464,10 +492,11 @@ const Flows: React.FC<Props> = (props) => {
                         title={StepDefToTitle(step.stepDefinitionType)}
                         size="small"
                         actions={[
-                            <span className={styles.stepResponse}>
-                                {latestJobData && latestJobData[flowName] && latestJobData[flowName][index] ?
-                                    lastRunResponse(latestJobData[flowName][index]): ''}
-                            </span>
+                            <span className={styles.stepResponse}>{
+                                latestJobData && latestJobData[flowName] && latestJobData[flowName][index]
+                                ? lastRunResponse(latestJobData[flowName][index])
+                                : ''
+                            }</span>
                         ]}
                         extra={
                             <div className={styles.actions}>
@@ -477,7 +506,6 @@ const Flows: React.FC<Props> = (props) => {
                                                 multiple={true}
                                                 className={styles.upload}
                                                 customRequest={customRequest}
-                                                showUploadList = {false}
                                                 {...uploadProps}
                                         >
                                         <div
@@ -560,7 +588,7 @@ const Flows: React.FC<Props> = (props) => {
             });
             return (
                 <Panel header={flowHeader(flowName, i)} key={i} extra={panelActions(flowName, i)}>
-                    <div className={styles.panelContent}>
+                    <div className={styles.panelContent} ref={flowPanels[flowName]}>
                         {cards}
                     </div>
                 </Panel>
