@@ -9,6 +9,7 @@ import sourceFormatOptions from '../../config/formats.config';
 import NewLoadDialog from './new-load-dialog/new-load-dialog';
 import { convertDateFromISO, sortStepsByUpdated } from '../../util/conversionFunctions';
 import AdvancedSettingsDialog from "../advanced-settings/advanced-settings-dialog";
+import StepSettings from "../step-settings/step-settings";
 import { AdvLoadTooltips, SecurityTooltips } from '../../config/tooltips.config';
 
 import { AuthoritiesContext } from "../../util/authorities";
@@ -45,6 +46,7 @@ const LoadCard: React.FC<Props> = (props) => {
     const [selected, setSelected] = useState({}); // track Add Step selections so we can reset on cancel
     const [selectVisible, setSelectVisible] = useState(false);
     const [openLoadSettings, setOpenLoadSettings] = useState(false);
+    const [openStepSettings, setOpenStepSettings] = useState(false);
 
     useEffect(() => {
        let sortedArray = props.data.length > 1 ? sortStepsByUpdated(props.data) : props.data;
@@ -68,6 +70,11 @@ const LoadCard: React.FC<Props> = (props) => {
     const OpenLoadSettingsDialog = (index) => {
         setStepData(prevState => ({ ...prevState, ...props.data[index]}));
         setOpenLoadSettings(true);
+    }
+
+    const OpenStepSettings = (index) => {
+        setStepData(prevState => ({ ...prevState, ...props.data[index]}));
+        setOpenStepSettings(true);
     }
 
     // Custom CSS for source Format
@@ -223,7 +230,8 @@ const LoadCard: React.FC<Props> = (props) => {
                     >
                         <Card
                             actions={[
-                            <MLTooltip title={'Settings'} placement="bottom"><Icon type="setting" key="setting" data-testid={elem.name+'-settings'} onClick={() => OpenLoadSettingsDialog(index)}/></MLTooltip>,
+                            // <MLTooltip title={'Settings'} placement="bottom"><Icon type="setting" key="setting" data-testid={elem.name+'-settings'} onClick={() => OpenLoadSettingsDialog(index)}/></MLTooltip>,
+                            <MLTooltip title={'Settings'} placement="bottom"><Icon type="setting" key="setting" data-testid={elem.name+'-settings'} onClick={() => OpenStepSettings(index)}/></MLTooltip>,
                             <MLTooltip title={'Edit'} placement="bottom"><Icon type="edit" key="edit" data-testid={elem.name+'-edit'} onClick={() => OpenEditStepDialog(index)}/></MLTooltip>,
                                 props.canReadWrite ?<MLTooltip title={'Delete'} placement="bottom"><i aria-label="icon: delete"><FontAwesomeIcon icon={faTrashAlt} className={styles.deleteIcon} size="lg"  data-testid={elem.name+'-delete'} onClick={() => handleCardDelete(elem.name)}/></i></MLTooltip> : <MLTooltip title={'Delete: ' + SecurityTooltips.missingPermission} placement="bottom" overlayStyle={{maxWidth: '200px'}}><i data-testid={elem.name+'-disabled-delete'}><FontAwesomeIcon icon={faTrashAlt} onClick={(event) => event.preventDefault()} className={styles.disabledDeleteIcon} size="lg"/></i></MLTooltip>,
                             ]}
@@ -266,7 +274,7 @@ const LoadCard: React.FC<Props> = (props) => {
                     </div>
                 </Col>)) : <span></span> }
             </Row>
-            <NewLoadDialog
+            {/* <NewLoadDialog
                 newLoad={newDataLoad}
                 title={title}
                 setNewLoad={setNewDataLoad}
@@ -274,14 +282,32 @@ const LoadCard: React.FC<Props> = (props) => {
                 stepData={stepData}
                 canReadWrite={props.canReadWrite}
                 canReadOnly={props.canReadOnly}
-            />
+            /> */}
             {deleteConfirmation}
             {addConfirmation}
-            <AdvancedSettingsDialog
+            {/* <AdvancedSettingsDialog
                 tooltipData={AdvLoadTooltips}
                 openAdvancedSettings={openLoadSettings}
                 setOpenAdvancedSettings={setOpenLoadSettings}
                 stepData={stepData}
+                activityType={activityType}
+                canWrite={authorityService.canWriteLoad()}
+            /> */}
+            <StepSettings
+                // Basic 
+                newLoad={newDataLoad}
+                title={title}
+                setNewLoad={setNewDataLoad}
+                createLoadArtifact={props.createLoadArtifact}
+                stepData={stepData}
+                canReadWrite={props.canReadWrite}
+                canReadOnly={props.canReadOnly}
+
+                // Advanced
+                tooltipData={AdvLoadTooltips}
+                openStepSettings={openStepSettings}
+                setOpenStepSettings={setOpenStepSettings}
+                //stepData={stepData}
                 activityType={activityType}
                 canWrite={authorityService.canWriteLoad()}
             />

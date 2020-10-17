@@ -70,6 +70,7 @@ const NewLoadDialog = (props) => {
       setDeleteDialogVisible(true);
     } else {
       props.setNewLoad(false);
+      props.setOpenStepSettings(false);
     }
   }
 
@@ -106,9 +107,9 @@ const NewLoadDialog = (props) => {
     }
   }
 
-  const onOk = () => {
-    props.setNewLoad(false);
-  }
+  // const onOk = () => {
+  //   props.setNewLoad(false);
+  // }
 
   const onDelOk = () => {
     props.setNewLoad(false);
@@ -244,19 +245,20 @@ const NewLoadDialog = (props) => {
   const toptions = Object.keys(tgtOptions).map(d => <Select.Option key={tgtOptions[d]}>{d}</Select.Option>);
 
 
-  return (<Modal visible={props.newLoad}
-    title={null}
-    width="55em"
-    onCancel={() => onCancel()}
-    onOk={() => onOk()}
-    okText="Save"
-    className={styles.modal}
-    footer={null}
-    maskClosable={false}
-    destroyOnClose={true}>
+  return (
+  // <Modal visible={props.newLoad}
+  //   title={null}
+  //   width="55em"
+  //   onCancel={() => onCancel()}
+  //   onOk={() => onOk()}
+  //   okText="Save"
+  //   className={styles.modal}
+  //   footer={null}
+  //   maskClosable={false}
+  //   destroyOnClose={true}>
 
-    <p className={styles.title}>{props.title}</p>
-    <br/>
+  //   <p className={styles.title}>{props.title}</p>
+  //   <br/>
     <div className={styles.newDataLoadForm}>
       <Form {...formItemLayout} onSubmit={handleSubmit} colon={false}>
         <Form.Item label={<span>
@@ -378,9 +380,9 @@ const NewLoadDialog = (props) => {
           </div>
         </Form.Item>
       </Form>
-    </div>
-    {deleteConfirmation}
-  </Modal>)
+      {deleteConfirmation}
+    </div> );
+  // </Modal>)
 }
 
 export default NewLoadDialog;
