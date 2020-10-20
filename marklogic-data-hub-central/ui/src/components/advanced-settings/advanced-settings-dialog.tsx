@@ -303,7 +303,7 @@ const AdvancedSettingsDialog = (props) => {
       }
     if (isPermissionsValid()) {
         createSettingsArtifact(dataPayload);
-        props.setOpenStepSettings(false)
+        props.setOpenStepSettings(false);
     }
   }
 

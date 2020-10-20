@@ -24,6 +24,17 @@ import {
     const onOk = () => {
         props.setOpenStepSettings(false)
     }
+
+    const activityMap = {
+        'ingestion': 'Loading',
+        'mapping': 'Mapping',
+        'custom': 'Custom',
+    }
+
+    const getTitle = () => {
+        let activity = props.activityType ? activityMap[props.activityType] : '';
+        return activity + ' Step Settings';
+    }
   
     const handleTab = (key) => {
       console.log('handleTab', key);
@@ -43,7 +54,7 @@ import {
     >
       <div className={styles.settingsContainer}>
         <header>
-            <div className={styles.title}>Mapping Step Settings</div>
+            <div className={styles.title}>{getTitle()}</div>
             {/* <div className={styles.stepName}>{props.stepData.name}</div> */}
         </header>
         <div className={styles.tabs}>

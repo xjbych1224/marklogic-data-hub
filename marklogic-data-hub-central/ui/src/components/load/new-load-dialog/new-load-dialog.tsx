@@ -168,6 +168,7 @@ const NewLoadDialog = (props) => {
     //Call create data load artifact API function
     props.createLoadArtifact(dataPayload);
     props.setNewLoad(false);
+    props.setOpenStepSettings(false);
   }
 
   const handleChange = (event) => {

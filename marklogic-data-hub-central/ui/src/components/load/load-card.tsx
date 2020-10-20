@@ -47,6 +47,7 @@ const LoadCard: React.FC<Props> = (props) => {
     const [selectVisible, setSelectVisible] = useState(false);
     const [openLoadSettings, setOpenLoadSettings] = useState(false);
     const [openStepSettings, setOpenStepSettings] = useState(false);
+    const [isNewStep, setIsNewStep] = useState(false);
 
     useEffect(() => {
        let sortedArray = props.data.length > 1 ? sortStepsByUpdated(props.data) : props.data;
@@ -58,6 +59,7 @@ const LoadCard: React.FC<Props> = (props) => {
 
     const OpenAddNewDialog = () => {
         setTitle('New Loading Step');
+        setIsNewStep(true);
         setNewDataLoad(true);
     }
 
@@ -73,6 +75,9 @@ const LoadCard: React.FC<Props> = (props) => {
     }
 
     const OpenStepSettings = (index) => {
+        setTitle('Edit Loading Step');
+        setIsNewStep(false);
+        // TODO handle new step
         setStepData(prevState => ({ ...prevState, ...props.data[index]}));
         setOpenStepSettings(true);
     }
